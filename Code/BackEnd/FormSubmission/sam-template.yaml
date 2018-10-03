@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  FormSubmissionFunction:
+      Type: AWS::Serverless::Function
+      Properties:
+        FunctionName: fb_FormSubmission_1
+        Handler: index.handler
+        Runtime: nodejs8.10
+        Policies: AmazonDynamoDBFullAccess
+        CodeUri: ./dist
+        Environment:
+            Variables:
+                FORMSUBMISSIONTABLE: !Ref FormSubmissionTable
+                # AWS::Region is a pseudo parameter whose value is pre-defined
+                # Returns a string representing the AWS Region in which the
+                # encompassing resource is being created, such as us-west-2.
+                REGION: !Ref AWS::Region
+                FORMSUBMISSIONLSI: formId-ModifiedAt-index
+        Events:
+          AddFormSubmission:
+            Type: Api
+            Properties:
+              Path: /formsubmission
+              Method: post
+          GetFormSubmissions:
+            Type: Api
+            Properties:
+              Path: /formsubmission/{id}
+              Method: get
+          FormSubmission:
+            Type: Api
+            Properties:
+              Path: /formsubmission/{formId}/{id}
+              Method: any
+  FormSubmissionTable:
+      Type: AWS::DynamoDB::Table   
+      Properties:
+        TableName: fb_FormSubmission_1
+        AttributeDefinitions: 
+        - 
+          AttributeName: formId
+          AttributeType: "S"
+        - 
+          AttributeName: id
+          AttributeType: "S"
+        - 
+          AttributeName: ModifiedAt
+          AttributeType: "N"
+        KeySchema: 
+         - AttributeName: formId
+           KeyType: HASH
+         - AttributeName: id
+           KeyType: RANGE
+        ProvisionedThroughput: 
+         ReadCapacityUnits: 5
+         WriteCapacityUnits: 5
+        LocalSecondaryIndexes:
+        - 
+          IndexName: formId-ModifiedAt-index
+          KeySchema: 
+            - 
+              AttributeName: "formId"
+              KeyType: "HASH"
+            - 
+              AttributeName: "ModifiedAt"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+
+  
+  
+         

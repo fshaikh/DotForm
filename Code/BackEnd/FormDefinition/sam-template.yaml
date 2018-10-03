@@ -1,0 +1,118 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  FormDefinitionFunction:
+      Type: AWS::Serverless::Function
+      Properties:
+        FunctionName: fb_FormDefinition
+        Handler: index.handler
+        Runtime: nodejs8.10
+        Policies: AmazonDynamoDBFullAccess
+        CodeUri: ./dist
+        Environment:
+            Variables:
+                FORMDEFINITIONTABLE: !Ref FormDefinitionTable
+                # AWS::Region is a pseudo parameter whose value is pre-defined
+                # Returns a string representing the AWS Region in which the
+                # encompassing resource is being created, such as us-west-2.
+                REGION: !Ref AWS::Region
+                FORMDEFINITIONMODIFIEDATLSI: userId-ModifiedAt-index
+                FORMDEFINITIONISTRASHLSI: userId-isTrash-index
+                FORMDEFINITIONISFAVORITELSI: userId-isFavorite-index
+                FORMDEFINITIONISARCHIVELSI: userId-isArchive-index
+        Events:
+          AddFormDefinition:
+            Type: Api
+            Properties:
+              Path: /formdefinition
+              Method: post
+          PatchFormDefinition:
+            Type: Api
+            Properties:
+              Path: /formdefinition/{userId}/{id}
+              Method: patch
+          DeleteFormDefinition:
+            Type: Api
+            Properties:
+              Path: /formdefinition/{userId}/{id}
+              Method: delete
+  FormDefinitionTable:
+      Type: AWS::DynamoDB::Table   
+      Properties:
+        TableName: fb_FormDefinition
+        AttributeDefinitions: 
+        - 
+          AttributeName: userId
+          AttributeType: "S"
+        - 
+          AttributeName: id
+          AttributeType: "S"
+        - 
+          AttributeName: ModifiedAt
+          AttributeType: "N"
+        - 
+          AttributeName: IsTrash
+          AttributeType: "B"
+        - 
+          AttributeName: IsFavorite
+          AttributeType: "B"
+        - 
+          AttributeName: IsArchive
+          AttributeType: "B"
+        KeySchema: 
+         - AttributeName: userId
+           KeyType: HASH
+         - AttributeName: id
+           KeyType: RANGE
+        ProvisionedThroughput: 
+         ReadCapacityUnits: 5
+         WriteCapacityUnits: 5
+        LocalSecondaryIndexes:
+        - 
+          IndexName: userId-ModifiedAt-index
+          KeySchema: 
+            - 
+              AttributeName: "userId"
+              KeyType: "HASH"
+            - 
+              AttributeName: "ModifiedAt"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+        - 
+          IndexName: userId-isTrash-index
+          KeySchema: 
+            - 
+              AttributeName: "userId"
+              KeyType: "HASH"
+            - 
+              AttributeName: "IsTrash"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+        - 
+          IndexName: userId-isFavorite-index
+          KeySchema: 
+            - 
+              AttributeName: "userId"
+              KeyType: "HASH"
+            - 
+              AttributeName: "IsFavorite"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+        - 
+          IndexName: userId-isArchive-index
+          KeySchema: 
+            - 
+              AttributeName: "userId"
+              KeyType: "HASH"
+            - 
+              AttributeName: "IsArchive"
+              KeyType: "RANGE"
+          Projection:
+            ProjectionType: "ALL"
+
+  
+  
+         

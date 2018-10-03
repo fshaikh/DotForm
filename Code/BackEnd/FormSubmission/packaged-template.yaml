@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  FormSubmissionFunction:
+    Properties:
+      CodeUri: s3://formbuilder-bucket/907f74490a1ccb0296bc0ba8f7647588
+      Environment:
+        Variables:
+          FORMSUBMISSIONLSI: formId-ModifiedAt-index
+          FORMSUBMISSIONTABLE:
+            Ref: FormSubmissionTable
+          REGION:
+            Ref: AWS::Region
+      Events:
+        AddFormSubmission:
+          Properties:
+            Method: post
+            Path: /formsubmission
+          Type: Api
+        FormSubmission:
+          Properties:
+            Method: any
+            Path: /formsubmission/{formId}/{id}
+          Type: Api
+        GetFormSubmissions:
+          Properties:
+            Method: get
+            Path: /formsubmission/{formId}
+          Type: Api
+      FunctionName: fb_FormSubmission_1
+      Handler: index.handler
+      Policies: AmazonDynamoDBFullAccess
+      Runtime: nodejs8.10
+    Type: AWS::Serverless::Function
+  FormSubmissionTable:
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: formId
+        AttributeType: S
+      - AttributeName: id
+        AttributeType: S
+      - AttributeName: ModifiedAt
+        AttributeType: N
+      KeySchema:
+      - AttributeName: formId
+        KeyType: HASH
+      - AttributeName: id
+        KeyType: RANGE
+      LocalSecondaryIndexes:
+      - IndexName: formId-ModifiedAt-index
+        KeySchema:
+        - AttributeName: formId
+          KeyType: HASH
+        - AttributeName: ModifiedAt
+          KeyType: RANGE
+        Projection:
+          ProjectionType: ALL
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableName: fb_FormSubmission_1
+    Type: AWS::DynamoDB::Table
+Transform: AWS::Serverless-2016-10-31

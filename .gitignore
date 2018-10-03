@@ -1,0 +1,11 @@
+Code/types
+Code/FrontEnd/formdesigner/
+Code/FrontEnd/formbuilder/node_modules/
+Code/BackEnd/types/
+Code/BackEnd/FormDefinition/dist/
+Code/BackEnd/FormDefinition/node_modules/
+Code/BackEnd/FormSubmission/dist/
+Code/BackEnd/FormSubmission/node_modules/
+Code/BackEnd/FormSubmission/.vscode/
+Code/Shared/dist/
+Code/Shared/node_modules/
