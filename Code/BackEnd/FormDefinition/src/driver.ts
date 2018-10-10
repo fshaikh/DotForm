@@ -12,8 +12,8 @@ async function submit_dev(){
     process.env.REGION = 'us-west-2';
     process.env.FORMSUBMISSIONTABLE = 'fb_FormDefinition';
     process.env.mode = 'dev';
-    process.env.AccessKey = 'AKIAJPLIQJIEVQ7RZBKA';
-    process.env.Secret = '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';
+    process.env.AccessKey = '';
+    process.env.Secret = '';
     
     await bulkImport();
     
